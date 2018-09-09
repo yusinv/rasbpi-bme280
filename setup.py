@@ -13,6 +13,5 @@ setup(
             'bme280_mqtt=rasbpi_bme280.mqtt_publish:main',
         ],
     },
-    data_files=[('share/doorbot', ['extra/doorbot.conf.template',
-                                   'extra/doorbot.systemd-unit-local'])],
+    data_files=[('etc/systemd/system/', ['extra/bme280_mqtt.service'])],
 )
