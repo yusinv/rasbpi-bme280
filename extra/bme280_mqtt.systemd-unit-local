@@ -1,0 +1,10 @@
+[Unit]
+Description=BME280 sensor MQTT publish service
+
+[Service]
+ExecStart=/usr/local/bin/bme280_mqtt
+Restart=on-failure
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target
