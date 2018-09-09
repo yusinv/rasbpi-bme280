@@ -8,6 +8,7 @@ setup(
     author='valentin',
     author_email='',
     description='', install_requires=['paho-mqtt'],
+    packages=['rasbpi_bme280'],
     entry_points={
         'console_scripts': [
             'bme280_mqtt=rasbpi_bme280.mqtt_publish:main',
