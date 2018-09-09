@@ -42,7 +42,7 @@ def main():
     while True:
         temperature, pressure, humidity = bme280.readBME280All()
         msgs = [(pub_topic + "temperature", str(temperature), 0, False),
-                (pub_topic + "pressure", str(pressure), 0, False),
+                (pub_topic + "pressure", str(pressure*0.75006375541921), 0, False),
                 (pub_topic + "humidity", str(humidity), 0, False)]
 
         publish.multiple(msgs, hostname=mqtt_broker_host)
