@@ -13,5 +13,5 @@ setup(
             'bme280_mqtt=rasbpi_bme280.mqtt_publish:main',
         ],
     },
-    data_files=[('etc/systemd/system/', ['extra/bme280_mqtt.service'])],
+    data_files=[('/etc/systemd/system/', ['extra/bme280_mqtt.service'])],
 )
