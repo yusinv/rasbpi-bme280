@@ -1,0 +1,10 @@
+---
+config:
+  mqtt_broker_host: 'nas'
+  temperature_topic: 'home/hall/temperature'
+  pressure_topic: 'home/hall/pressure'
+  humidity_topic: 'home/hall/humidity'
+  discovery:
+    prefix: 'home/discovery'
+    name: 'BME 280'
+    id: 'hall_bme_280'
