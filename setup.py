@@ -7,7 +7,7 @@ setup(
     license='',
     author='valentin',
     author_email='',
-    description='', install_requires=['paho-mqtt', 'pyyaml'],
+    description='', install_requires=['paho-mqtt', 'pyyaml', 'smbus'],
     packages=['rasbpi_bme280'],
     entry_points={
         'console_scripts': [
