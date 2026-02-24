@@ -31,57 +31,65 @@ def main():
 
     load_conf_file(config_path)
 
-
-
     if 'discovery' in config:
         discovery_conf = config['discovery']
 
-        device = {
-            "identifiers": [
-                f'{discovery_conf["id"]}'
-            ],
-            "name": f'{discovery_conf["name"]}'
+        discovery_msg = {
+            'dev': {
+                'ids': f'{discovery_conf["id"]}',
+                'name': f'{discovery_conf["name"]}',
+                'mf': 'Bla electronics',
+                'mdl': 'xya',
+                'sw': '1.0',
+                'sn': 'ea334450945afc',
+                'hw': '1.0rev2'
+            },
+            'o': {
+                'name': 'bla2mqtt',
+                'sw': '2.1',
+                'url': 'https://bla2mqtt.example.com/support'
+            },
+            'cmps': {
+                f'{discovery_conf["id"]}_t': {
+                    'name': f'{discovery_conf.get("name", "BME 280")} Temperature',
+                    'p': 'sensor',
+                    'device_class': 'temperature',
+                    'unit_of_measurement': '°C',
+                    'value_template': '{{ value_json.temperature }}',
+                    'unique_id': f'{discovery_conf["id"]}_t'
+                },
+                f'{discovery_conf["id"]}_p': {
+                    'name': f'{discovery_conf.get("name", "BME 280")} Pressure',
+                    'p': 'sensor',
+                    'device_class': 'pressure',
+                    'unit_of_measurement': 'mmHg',
+                    'value_template': '{{ value_json.pressure }}',
+                    'unique_id': f'{discovery_conf["id"]}_p'
+                },
+                f'{discovery_conf["id"]}_h': {
+                    'name': f'{discovery_conf.get("name", "BME 280")} Humidity',
+                    'p': 'sensor',
+                    'device_class': 'humidity',
+                    'unit_of_measurement': '%',
+                    'value_template': '{{ value_json.humidity }}',
+                    'unique_id': f'{discovery_conf["id"]}_h'
+                },
+            },
+            'state_topic': config.get('state_topic', 'home/hall_bme_280/state'),
+            'qos': 2
         }
 
-        temperature_sensor_conf = {
-            'name': f'{discovery_conf.get("name", "BME 280")} Temperature',
-            'device_class': 'temperature',
-            'state_topic': config.get('temperature_topic', 'temp'),
-            "unique_id": f'{discovery_conf["id"]}_t',
-            'unit_of_measurement': '°C',
-            "device": device
-        }
-        pressure_sensor_conf = {
-            'name': f'{discovery_conf.get("name", "BME 280")} Pressure',
-            'device_class': 'pressure',
-            'state_topic': config.get('pressure_topic', 'pressure'),
-            "unique_id": f'{discovery_conf["id"]}_p',
-            'unit_of_measurement': 'mmHg',
-            "device": device
-        }
-        humidity_sensor_conf = {
-            'name': f'{discovery_conf.get("name", "BME 280")} Humidity',
-            'device_class': 'humidity',
-            'state_topic': config.get('humidity_topic', 'humidity'),
-            "unique_id": f'{discovery_conf["id"]}_h',
-            'unit_of_measurement': '%',
-            "device": device
-        }
-        msgs = [(f'{discovery_conf["prefix"]}/sensor/{discovery_conf["id"]}_t/config',
-                 json.dumps(temperature_sensor_conf), 0, True),
-                (f'{discovery_conf["prefix"]}/sensor/{discovery_conf["id"]}_p/config',
-                 json.dumps(pressure_sensor_conf), 0, True),
-                (f'{discovery_conf["prefix"]}/sensor/{discovery_conf["id"]}_h/config',
-                 json.dumps(humidity_sensor_conf), 0, True)]
-        publish.multiple(msgs, hostname=config['mqtt_broker_host'])
+        publish.single(f'{discovery_conf["prefix"]}/device/{discovery_conf["id"]}/config',
+                       json.dumps(discovery_msg), 0, True)
 
     while True:
         temperature, pressure, humidity = bme280.read_bme280_all()
-        msgs = [(config.get('temperature_topic', 'temp'), f'{temperature:.2f}', 0, False),
-                (config.get('pressure_topic', 'pressure'), f'{pressure * 0.75006375541921:.2f}', 0, False),
-                (config.get('humidity_topic', 'humidity'), f'{humidity:.2f}', 0, False)]
-
-        publish.multiple(msgs, hostname=config['mqtt_broker_host'])
+        publish.single(config.get('state_topic', 'home/hall_bme_280/state'),
+                       json.dumps({
+                           "temperature": temperature,
+                           "pressure": pressure,
+                           "humidity": humidity
+                       }))
         time.sleep(1 * 60)
 
 

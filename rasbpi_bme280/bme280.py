@@ -113,8 +113,9 @@ def read_bme280_all(addr=DEVICE):
     hum_raw = (data[6] << 8) | data[7]
 
     # Refine temperature
-    var1 = ((temp_raw >> 3 - dig_t1 << 1) * dig_t2) >> 11
-    var2 = (((((temp_raw >> 4) - dig_t1) * ((temp_raw >> 4) - dig_t1)) >> 12) * dig_t3) >> 14
+    var1 = ((((temp_raw >> 3) - (dig_t1 << 1))) * (dig_t2)) >> 11
+    var2 = (((((temp_raw >> 4) - (dig_t1)) * ((temp_raw >> 4) - (dig_t1))) >> 12) * (dig_t3)) >> 14
+
     t_fine = var1 + var2
     temperature = float(((t_fine * 5) + 128) >> 8)
 
