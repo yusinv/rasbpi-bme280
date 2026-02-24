@@ -31,25 +31,41 @@ def main():
 
     load_conf_file(config_path)
 
+
+
     if 'discovery' in config:
         discovery_conf = config['discovery']
+
+        device = {
+            "identifiers": [
+                f'{discovery_conf["id"]}'
+            ],
+            "name": f'{discovery_conf["name"]}'
+        }
+
         temperature_sensor_conf = {
             'name': f'{discovery_conf.get("name", "BME 280")} Temperature',
             'device_class': 'temperature',
             'state_topic': config.get('temperature_topic', 'temp'),
-            'unit_of_measurement': '°C'
+            "unique_id": f'{discovery_conf["id"]}_t',
+            'unit_of_measurement': '°C',
+            "device": device
         }
         pressure_sensor_conf = {
             'name': f'{discovery_conf.get("name", "BME 280")} Pressure',
             'device_class': 'pressure',
             'state_topic': config.get('pressure_topic', 'pressure'),
-            'unit_of_measurement': 'mmHg'
+            "unique_id": f'{discovery_conf["id"]}_p',
+            'unit_of_measurement': 'mmHg',
+            "device": device
         }
         humidity_sensor_conf = {
             'name': f'{discovery_conf.get("name", "BME 280")} Humidity',
             'device_class': 'humidity',
             'state_topic': config.get('humidity_topic', 'humidity'),
-            'unit_of_measurement': '%'
+            "unique_id": f'{discovery_conf["id"]}_h',
+            'unit_of_measurement': '%',
+            "device": device
         }
         msgs = [(f'{discovery_conf["prefix"]}/sensor/{discovery_conf["id"]}_t/config',
                  json.dumps(temperature_sensor_conf), 0, True),
@@ -60,7 +76,7 @@ def main():
         publish.multiple(msgs, hostname=config['mqtt_broker_host'])
 
     while True:
-        temperature, pressure, humidity = bme280.readBME280All()
+        temperature, pressure, humidity = bme280.read_bme280_all()
         msgs = [(config.get('temperature_topic', 'temp'), f'{temperature:.2f}', 0, False),
                 (config.get('pressure_topic', 'pressure'), f'{pressure * 0.75006375541921:.2f}', 0, False),
                 (config.get('humidity_topic', 'humidity'), f'{humidity:.2f}', 0, False)]
